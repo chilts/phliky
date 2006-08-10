@@ -13,11 +13,6 @@ use URI::Escape;
 use Regexp::Common;
 
 ## ----------------------------------------------------------------------------
-# constants
-
-my $C = 'constant';
-
-## ----------------------------------------------------------------------------
 # new
 
 sub new {
@@ -47,44 +42,44 @@ sub text2html {
     my $html;
 
     chomp $text;
-    my @paras = split /\n\n+/, $text;
+    my @chunks = split /\n\n+/, $text;
     my @html;
-    foreach my $para ( @paras ) {
-        push @html, $self->parse_para( $para );
+    foreach my $chunk ( @chunks ) {
+        push @html, $self->parse_chunk( $chunk );
     }
 
     return join '', @html;
 }
 
-sub parse_para {
-    my ($self, $para) = @_;
-    if ( $para =~ m{ \A \!([123456]) \s (.*) \z }xms ) {
-        $para = $2;
-        return "<h$1>" . $self->esc($para) . "</h$1>\n";
+sub parse_chunk {
+    my ($self, $chunk) = @_;
+    if ( $chunk =~ m{ \A \!([123456]) \s (.*) \z }xms ) {
+        $chunk = $2;
+        return "<h$1>" . $self->esc($chunk) . "</h$1>\n";
     }
-    elsif ( $para =~ m{ \A \s }xms ) {
-        return "<pre>\n" . $self->esc($para) . "\n</pre>\n";
+    elsif ( $chunk =~ m{ \A \s }xms ) {
+        return "<pre>\n" . $self->esc($chunk) . "\n</pre>\n";
     }
-    elsif ( $para =~ m{ \A \^ \s (.*) \z }xms ) {
-        $para = $1;
-        return "<p style=\"text-align: center;\">" . $self->parse_inline( $self->esc($para) ) . "</p>\n";
+    elsif ( $chunk =~ m{ \A \^ \s (.*) \z }xms ) {
+        $chunk = $1;
+        return "<p style=\"text-align: center;\">" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
     }
-    elsif ( $para =~ m{ \A ([\#\*]) \s .* \z }xms ) {
-        return $self->list( $1, $para );
+    elsif ( $chunk =~ m{ \A ([\#\*]) \s .* \z }xms ) {
+        return $self->list( $1, $chunk );
     }
     else {
-        # unknown paragraph style, output as normal
-        return "<p>" . $self->parse_inline( $self->esc($para) ) . "</p>\n";
+        # unknown chunk style, output as normal
+        return "<p>" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
     }
     return "[program error]";
 }
 
 sub list {
-    my ($self, $type, $para) = @_;
+    my ($self, $type, $chunk) = @_;
     my $indent = 0;
 
     # make the para into lines
-    my @lines = split m{\n}xms, $para;
+    my @lines = split m{\n}xms, $chunk;
 
     my $element = $type eq '#' ? 'ol' : 'ul';
 
@@ -146,30 +141,98 @@ B<Text::Phliky> - A Wiki/Blog-Type text to html converter.
 
     use Text::Phliky;
     my $phliky = Text::Phliky->new();
-    my $html = $phliky->text2html($str);
+    my $html = $phliky->text2html($text);
 
 =head1 DESCRIPTION
 
+Given a Phliky text document, this module writes out the text formatted as
+HTML. It is very simple, straightforward and independent of an actual wiki. It
+was designed this way so that it can be called by a wiki, a content management
+system, a news publisher or any number of different applications.
 
+=head2 Methods
+
+=over 4
+
+=item I<PACKAGE>->new()
+
+Returns a new C<Text::Phliky> object. This can be used to convert some text to
+HTML.
+
+=item I<$OBJ>->I<text2html>($text)  or  I<PACKAGE>->I<text2html>($text)
+
+Returns the HTML version of the text passed in.
+
+=back
+
+=head1 Parsing
+
+The module is simple in it's process of conversion. Firstly, the text is split
+into chunks (anything which has 2 returns between them). Each chunk is then
+analysed to determine it's type, be it a heading, preformatted text or a
+paragraph.
+
+In some cases, once the chunk type has been decided, it will also be parsed for
+inline elements. For example, a normal paragraph or each list item will be
+parsed for styles whereas a header or a preformatted text chunk will not. See
+below for more details.
 
 =head1 EXAMPLE
 
+    use Text::Phliky;
+
+    my $text <<'PHLIKIDOC';
+
+    !1 A Heading
+
+    This is an introductory paragraph with some styles such as \i{italic},
+    \b{bold} and \c{code}. Since it is a normal paragraph, it will be parsed
+    for the inline styles.
+
+    * a simple list
+    * This \c{too} can contain \b{inline} \i{styles}
+    * an \l{external link|http://kapiti.geek.nz/}
+    * a \l{popup link|http://kapiti.geek.nz/}
+
+    !2 Headings are not parsed for styles
+
+      /* preformatted text - this chunk starts with 1 or more spaces */
+      #include <stdio.h>
+      void main() {
+          printf("Hello world!\n");
+      }
+
+    PHLIKIDOC
+
+    my $phliky = Text::Phliky->new();
+    my $html = $phliky->text2html( $text );
+
+=head1 FUTURE ADDITIONS
+
+At some stage, I will certainly add tables. The fact that multi-level lists are
+missing can be considered a bug and needs to be fixed. Other inline styles
+which make sense may be added if requested. Up to now, I have added what I need
+and haven't needed very much - for it makes nice and uncomplicated pages.
 
 =head1 BUGS
 
-text
+There might be. Please let me know and if possible, please provide an example
+of the input text and the HTML you expected to see.
 
 =head1 AUTHOR
 
-Andrew Chilton B<andy@kapiti.geek.nz>
+Andrew Chilton - andy@kapiti.geek.nz
 
 Copyright (c) 2006 Andrew Chilton.  All rights reserved.  All wrongs reversed.
 This program is free software; you can redistribute and/or modify it under the
 same terms as Perl itself.
 
-=head1 ACKNOWLEDGMENTS
+=head1 VERSION
 
-B<A Name>
-found bug where two spaces didn't get converted
+Version 0.1
+
+=head1 SEE ALSO
+
+perl(1)
 
 =cut
