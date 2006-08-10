@@ -1,0 +1,12 @@
+Changes
+lib/Text/Phliky.pm
+t/initial.t
+t/class.t
+t/complex.t
+t/initial.t
+t/inline.t
+t/para.t
+t/simple.t
+t/unknown.t
+MANIFEST
+Makefile.PL
