@@ -1,0 +1,18 @@
+Source: libtext-phliky-perl
+Section: perl
+Priority: optional
+Maintainer: Andrew Chilton <andy@kapiti.geek.nz>
+Uploaders: Andrew Chilton <andy@kapiti.geek.nz>
+Standards-Version: 3.6.1
+Build-Depends-Indep: debhelper (>= 4.1), perl
+
+Package: libtext-phliky-perl
+Section: perl
+Priority: optional
+Architecture: all
+Build-Depends: ${perl:Depends}, libregexp-common-perl
+Pre-Depends: ${perl:Depends}
+Depends: libregexp-common-perl
+Description: another way to format text into html
+ This module provides another text to html crazy conversion scheme. But the
+ difference is, it's _my_ conversion scheme :-)
