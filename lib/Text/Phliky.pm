@@ -4,22 +4,16 @@ package Text::Phliky;
 use strict;
 use warnings;
 use Carp;
+use base qw(Class::Accessor);
 use vars qw($VERSION);
-
-$VERSION = '0.1';
 
 use HTML::Entities;
 use URI::Escape;
 use Regexp::Common;
 
-## ----------------------------------------------------------------------------
-# new
+$VERSION = '0.1';
 
-sub new {
-    my ($invocant, $args) = @_;
-    my $self = bless {}, ref $invocant || $invocant;
-    return $self;
-}
+Text::Phliky->mk_accessors(qw(text));
 
 ## ----------------------------------------------------------------------------
 # class functions
@@ -35,47 +29,56 @@ sub uri {
 }
 
 ## ----------------------------------------------------------------------------
-# methods
+# instance methods
+
+sub html {
+    my ($self, $class) = @_;
+    return $self->text2html( $self->{text} );
+}
+
+## ----------------------------------------------------------------------------
+# class methods
 
 sub text2html {
-    my ($self, $text) = @_;
-    my $html;
+    my ($class, $text) = @_;
+    return unless defined $text;
 
     chomp $text;
-    my @chunks = split /\n\n+/, $text;
+
     my @html;
+    my @chunks = split /\n\n+/, $text;
     foreach my $chunk ( @chunks ) {
-        push @html, $self->parse_chunk( $chunk );
+        push @html, $class->parse_chunk( $chunk );
     }
 
     return join '', @html;
 }
 
 sub parse_chunk {
-    my ($self, $chunk) = @_;
+    my ($class, $chunk) = @_;
     if ( $chunk =~ m{ \A \!([123456]) \s (.*) \z }xms ) {
         $chunk = $2;
-        return "<h$1>" . $self->esc($chunk) . "</h$1>\n";
+        return "<h$1>" . $class->esc($chunk) . "</h$1>\n";
     }
     elsif ( $chunk =~ m{ \A \s }xms ) {
-        return "<pre>\n" . $self->esc($chunk) . "\n</pre>\n";
+        return "<pre>\n" . $class->esc($chunk) . "\n</pre>\n";
     }
     elsif ( $chunk =~ m{ \A \^ \s (.*) \z }xms ) {
         $chunk = $1;
-        return "<p style=\"text-align: center;\">" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
+        return "<p style=\"text-align: center;\">" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";
     }
     elsif ( $chunk =~ m{ \A ([\#\*]) \s .* \z }xms ) {
-        return $self->list( $1, $chunk );
+        return $class->list( $1, $chunk );
     }
     else {
         # unknown chunk style, output as normal
-        return "<p>" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
+        return "<p>" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";
     }
     return "[program error]";
 }
 
 sub list {
-    my ($self, $type, $chunk) = @_;
+    my ($class, $type, $chunk) = @_;
     my $indent = 0;
 
     # make the para into lines
@@ -86,14 +89,14 @@ sub list {
     my $html = "<$element>\n";
     foreach my $items ( @lines ) {
         $items =~ s{ \A [\#\*] \s }{}xms;
-        $html .= '  <li>' . $self->parse_inline( $self->esc($items) ) . "</li>\n";
+        $html .= '  <li>' . $class->parse_inline( $class->esc($items) ) . "</li>\n";
     }
     $html .= "</$element>\n";
     return $html;
 }
 
 sub parse_inline {
-    my ($self, $line) = @_;
+    my ($class, $line) = @_;
     # do stuff
     while ( my ($type, $str) = $line =~ m{ \\([a-z]*)($RE{balanced}{-parens=>'{}'}) }xms ) {
         $str =~ s{ \A \{ }{}gxms;
