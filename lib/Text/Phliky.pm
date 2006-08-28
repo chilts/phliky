@@ -6,12 +6,14 @@ use warnings;
 use Carp;
 use base qw(Class::Accessor);
 use vars qw($VERSION);
-
 use HTML::Entities;
 use URI::Escape;
 use Regexp::Common;
+$VERSION = '0.2';
 
-$VERSION = '0.1';
+my $entity = {
+    copy => '&copy;',
+};
 
 Text::Phliky->mk_accessors(qw(text));
 
@@ -66,6 +68,10 @@ sub parse_chunk {
     elsif ( $chunk =~ m{ \A \^ \s (.*) \z }xms ) {
         $chunk = $1;
         return "<p style=\"text-align: center;\">" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";
+    }
+    elsif ( $chunk =~ m{ \A < \s (.*) \z }xms ) {
+        $chunk = $1;
+        return "$chunk\n";
     }
     elsif ( $chunk =~ m{ \A ([\#\*]) \s .* \z }xms ) {
         return $class->list( $1, $chunk );
@@ -122,6 +128,9 @@ sub parse_inline {
             my ($title, $src) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
             return '<img src="' . $src . '" title="' . $title . "\" />\n";
         }
+        elsif ( exists $entity->{$type} ) {
+            $line =~ s{ \\$type ($RE{balanced}{-parens=>'{}'}) }{$entity->{$type}}xms;
+        }
 
         else {
             $line =~ s{ \\([a-z]*) ($RE{balanced}{-parens=>'{}'}) }{\\[$1]{$str}}xms;
@@ -137,7 +146,7 @@ sub parse_inline {
 
 =head1 NAME
 
-B<Text::Phliky> - A Wiki/Blog-Type text to html converter.
+B<Text::Phliky> - A Wiki/Blog/News/Content/Article text to html converter.
 
 
 =head1 SYNOPSIS
@@ -232,7 +241,7 @@ same terms as Perl itself.
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2
 
 =head1 SEE ALSO
 

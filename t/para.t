@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 3;
+plan tests => 4;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -26,6 +26,14 @@ $text = "^ a quote";
 $html_exp = "<p style=\"text-align: center;\">a quote</p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'centered');
+
+## ----------------------------------------------------------------------------
+# html
+
+$text = "< &copy; 2006 <b>Andrew Chilton</b>";
+$html_exp = "&copy; 2006 <b>Andrew Chilton</b>\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'html text');
 
 ## ----------------------------------------------------------------------------
 # an unordered list
