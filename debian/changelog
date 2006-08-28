@@ -1,3 +1,9 @@
+libtext-phliky-perl (0.2.0) unstable; urgency=low
+
+  * Ready for 0.2 release
+
+ -- Andrew Chilton <andy@kapiti.geek.nz>  Thu, 10 Aug 2006 23:53:17 +1200
+
 libtext-phliky-perl (0.1.0) unstable; urgency=low
 
   * Initial Release
