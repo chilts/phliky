@@ -74,7 +74,7 @@ sub parse_chunk {
         return "$chunk\n";
     }
     elsif ( $chunk =~ m{ \A ([\#\*]) \s .* \z }xms ) {
-        return $class->list( $1, $chunk );
+        return $class->list( $chunk );
     }
     else {
         # unknown chunk style, output as normal
@@ -84,21 +84,59 @@ sub parse_chunk {
 }
 
 sub list {
-    my ($class, $type, $chunk) = @_;
-    my $indent = 0;
+    my ($class, $chunk) = @_;
 
     # make the para into lines
     my @lines = split m{\n}xms, $chunk;
 
-    my $element = $type eq '#' ? 'ol' : 'ul';
+    return '' unless @lines;
 
-    my $html = "<$element>\n";
-    foreach my $items ( @lines ) {
-        $items =~ s{ \A [\#\*] \s }{}xms;
-        $html .= '  <li>' . $class->parse_inline( $class->esc($items) ) . "</li>\n";
+    my $html = '';
+    my $indent = [];
+
+    foreach my $line (@lines) {
+        my ($type, $length, $content) = $class->line_info( $line );
+
+        if ( $length == @$indent ) {
+            $html .= "</li><li>" . $class->parse_inline( $class->esc($content) );
+        }
+        elsif ( $length == scalar @$indent+1 ) {
+            # $html .= "</li>" unless @$indent == 0;
+            push @$indent, $type;
+            $html .= "<$type><li>" . $class->parse_inline( $class->esc($content) );
+        }
+        elsif ( $length < @$indent ) {
+            until ( $length == @$indent ) {
+                my $t = pop @$indent;
+                $html .= "</li></$t>";
+            }
+            $html .= "</li><li>" . $class->parse_inline( $class->esc($content) );
+        }
+        else {
+            # croak "You can't indent lists by more than one at a time";
+            until ( @$indent == $length) {
+                push @$indent, $type;
+                $html .= "<$type><li>";
+            }
+            $html .= $class->parse_inline( $class->esc($content) );
+        }
     }
-    $html .= "</$element>\n";
+    while ( my $t = pop @$indent ) {
+        $html .= "</li></$t>";
+    }
     return $html;
+}
+
+sub line_info {
+    my ($class, $line) = @_;
+
+    return unless defined $line;
+
+    my ($type, $content) = $line =~ m{ \A ([\#\*]*) \s (.*) \z }xms;
+    my $length = length $type;
+    $type = substr($type, 0, 1) eq '#' ? 'ol' : 'ul';
+
+    return ($type, $length, $content);
 }
 
 sub parse_inline {
