@@ -59,22 +59,31 @@ sub text2html {
 sub parse_chunk {
     my ($class, $chunk) = @_;
     if ( $chunk =~ m{ \A \!([123456]) \s (.*) \z }xms ) {
+        # headings
         $chunk = $2;
         return "<h$1>" . $class->esc($chunk) . "</h$1>\n";
     }
     elsif ( $chunk =~ m{ \A \s }xms ) {
+        # pre-formatted text
         return "<pre>\n" . $class->esc($chunk) . "\n</pre>\n";
     }
     elsif ( $chunk =~ m{ \A \^ \s (.*) \z }xms ) {
+        # a centered paragraph
         $chunk = $1;
         return "<p style=\"text-align: center;\">" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";
     }
     elsif ( $chunk =~ m{ \A < \s (.*) \z }xms ) {
+        # just a HTML paragraph
         $chunk = $1;
         return "$chunk\n";
     }
     elsif ( $chunk =~ m{ \A ([\#\*]) \s .* \z }xms ) {
+        # a list of some sort
         return $class->list( $chunk );
+    }
+    elsif ( $chunk =~ m{ \A : \s (.*) \z }xms ) {
+        # a definition list
+        return $class->definition( $1 );
     }
     else {
         # unknown chunk style, output as normal
@@ -137,6 +146,25 @@ sub line_info {
     $type = substr($type, 0, 1) eq '#' ? 'ol' : 'ul';
 
     return ($type, $length, $content);
+}
+
+sub definition {
+    my ($class, $chunk) = @_;
+
+    # make the para into lines
+    my @lines = split m{\n}xms, $chunk;
+
+    return '' unless @lines;
+
+    my $html = "<dl>\n";
+    foreach my $line (@lines) {
+        my ($dt, $dd) = $line =~ m{ \A ([^:]+): \s (.*) \z }xms;
+        next unless defined $dt and defined $dd;
+        $html .= "  <dt>" . $class->esc($dt) . "</dt>\n";
+        $html .= "  <dd>" . $class->esc($dd) . "</dd>\n";
+    }
+    $html .= "</dl>\n";
+    return $html;
 }
 
 sub parse_inline {
@@ -251,6 +279,11 @@ below for more details.
       void main() {
           printf("Hello world!\n");
       }
+
+    !2 Definition List
+
+    : Coffee: Black hot drink
+    Milk: White cold drink
 
     PHLIKIDOC
 
