@@ -46,8 +46,8 @@ is($html_got, $html_exp, 'code');
 ## ----------------------------------------------------------------------------
 # image
 
-$text = "\\img{Sunset at Kapiti|http://photos.chilts.org/s/m/2e88cad09e3ad52acf8d5bbfcefd8834.jpg}";
-$html_exp = "<p><img src=\"http://photos.chilts.org/s/m/2e88cad09e3ad52acf8d5bbfcefd8834.jpg\" title=\"Sunset at Kapiti\" />\n</p>\n";
+$text = "Sunset at \\img{Kapiti|http://photos.chilts.org/s/m/2e88cad09e3ad52acf8d5bbfcefd8834.jpg}.";
+$html_exp = "<p>Sunset at <img src=\"http://photos.chilts.org/s/m/2e88cad09e3ad52acf8d5bbfcefd8834.jpg\" title=\"Kapiti\" />.</p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'img');
 

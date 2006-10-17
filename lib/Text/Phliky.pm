@@ -194,7 +194,9 @@ sub parse_inline {
         }
         elsif ( $type eq 'img' ) {
             my ($title, $src) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
-            return '<img src="' . $src . '" title="' . $title . "\" />\n";
+            $title = $class->esc($title);
+            $src = $class->esc($src);
+            $line =~ s{ \\img ($RE{balanced}{-parens=>'{}'}) }{<img src="$src" title="$title" />}xms;
         }
         elsif ( $type eq 'a' ) {
             my ($abbr, $abbreviation) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
