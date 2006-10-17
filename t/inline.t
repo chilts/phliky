@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 5;
+plan tests => 6;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -58,5 +58,13 @@ $text = "This is an \\a{Abbr|Abbreviation} for Phliky";
 $html_exp = "<p>This is an <acronym title=\"Abbreviation\">Abbr</acronym> for Phliky</p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'abbreviation');
+
+## ----------------------------------------------------------------------------
+# abbreviation 2
+
+$text = "\\a{<*OMG*>|<Oh My God>}";
+$html_exp = "<p><acronym title=\"&lt;Oh My God&gt;\">&lt;*OMG*&gt;</acronym></p>\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'abbreviation 2');
 
 ## ----------------------------------------------------------------------------

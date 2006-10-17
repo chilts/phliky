@@ -194,14 +194,10 @@ sub parse_inline {
         }
         elsif ( $type eq 'img' ) {
             my ($title, $src) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
-            $title = $class->esc($title);
-            $src = $class->esc($src);
             $line =~ s{ \\img ($RE{balanced}{-parens=>'{}'}) }{<img src="$src" title="$title" />}xms;
         }
         elsif ( $type eq 'a' ) {
             my ($abbr, $abbreviation) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
-            $abbr = $class->esc($abbr);
-            $abbreviation = $class->esc($abbreviation);
             $line =~ s{ \\a ($RE{balanced}{-parens=>'{}'}) }{<acronym title="$abbreviation">$abbr</acronym>}xms;
         }
         elsif ( exists $entity->{$type} ) {
