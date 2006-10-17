@@ -171,8 +171,10 @@ sub parse_inline {
     my ($class, $line) = @_;
     # do stuff
     while ( my ($type, $str) = $line =~ m{ \\([a-z]*)($RE{balanced}{-parens=>'{}'}) }xms ) {
+        # remove leading/trailing whitespace
         $str =~ s{ \A \{ }{}gxms;
         $str =~ s{ \} \z }{}gxms;
+
         if ( $type eq 'b' ) {
             $line =~ s{ \\b ($RE{balanced}{-parens=>'{}'}) }{<b>$str</b>}xms;
         }
@@ -193,6 +195,12 @@ sub parse_inline {
         elsif ( $type eq 'img' ) {
             my ($title, $src) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
             return '<img src="' . $src . '" title="' . $title . "\" />\n";
+        }
+        elsif ( $type eq 'a' ) {
+            my ($abbr, $abbreviation) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
+            $abbr = $class->esc($abbr);
+            $abbreviation = $class->esc($abbreviation);
+            $line =~ s{ \\a ($RE{balanced}{-parens=>'{}'}) }{<acronym title="$abbreviation">$abbr</acronym>}xms;
         }
         elsif ( exists $entity->{$type} ) {
             $line =~ s{ \\$type ($RE{balanced}{-parens=>'{}'}) }{$entity->{$type}}xms;
