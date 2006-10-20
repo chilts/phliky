@@ -176,7 +176,7 @@ sub parse_inline {
         $str =~ s{ \} \z }{}gxms;
 
         if ( $type eq 'b' ) {
-            $line =~ s{ \\b ($RE{balanced}{-parens=>'{}'}) }{<b>$str</b>}xms;
+            $line =~ s{ \\b ($RE{balanced}{-parens=>'{}'}) }{<strong>$str</strong>}xms;
         }
         elsif ( $type eq 'i' ) {
             $line =~ s{ \\i ($RE{balanced}{-parens=>'{}'}) }{<em>$str</em>}xms;

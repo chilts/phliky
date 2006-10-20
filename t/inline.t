@@ -23,7 +23,7 @@ my ($text, $html_exp, $html_got);
 # bold
 
 $text = "To \\b{bold}.";
-$html_exp = "<p>To <b>bold</b>.</p>\n";
+$html_exp = "<p>To <strong>bold</strong>.</p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'bold');
 

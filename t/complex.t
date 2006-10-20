@@ -39,7 +39,7 @@ EOF
 
 $html_exp =<<'EOF';
 <h1>A Heading</h1>
-<p>This is a paragraph which has <b>bold</b> and <em>italic</em>. Also, we have a pre paragraph:</p>
+<p>This is a paragraph which has <strong>bold</strong> and <em>italic</em>. Also, we have a pre paragraph:</p>
 <pre>
  Like this one
  which outputs the same.
@@ -56,7 +56,7 @@ is($html_got, $html_exp, 'complex paragraph');
 ## ----------------------------------------------------------------------------
 
 $text = "^ \\b{a quote}";
-$html_exp = "<p style=\"text-align: center;\"><b>a quote</b></p>\n";
+$html_exp = "<p style=\"text-align: center;\"><strong>a quote</strong></p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'centered');
 
