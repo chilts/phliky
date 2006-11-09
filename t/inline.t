@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 6;
+plan tests => 7;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -50,6 +50,14 @@ $text = "Sunset at \\img{Kapiti|http://photos.chilts.org/s/m/2e88cad09e3ad52acf8
 $html_exp = "<p>Sunset at <img src=\"http://photos.chilts.org/s/m/2e88cad09e3ad52acf8d5bbfcefd8834.jpg\" title=\"Kapiti\" />.</p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'img');
+
+## ----------------------------------------------------------------------------
+# image
+
+$text = "Image \\img{one|one.jpg} and image \\img{two|two.jpg}.";
+$html_exp = '<p>Image <img src="one.jpg" title="one" /> and image <img src="two.jpg" title="two" />.</p>' . "\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'img x 2');
 
 ## ----------------------------------------------------------------------------
 # abbreviation
