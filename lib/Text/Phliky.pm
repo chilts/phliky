@@ -15,6 +15,14 @@ my $entity = {
     copy => '&copy;',
 };
 
+my $lut = {
+    table => {
+        '[' => 'thead',
+        ']' => 'tfoot',
+        '-' => 'tbody',
+    },
+};
+
 Text::Phliky->mk_accessors(qw(text));
 
 ## ----------------------------------------------------------------------------
@@ -184,41 +192,21 @@ sub table {
 
     $html .= "<table>\n";
 
-  TOP:
+    my $cur_type = '';
     while ( my $line = shift @lines ) {
         my ($type, $rest) = $line =~ m{ \A ([\[\]\-]) \s (.*) \z }xms;
 
-        return unless defined $type;
+        return '' unless defined $type;
 
-        my ($re, $tag);
-        if ( $type eq '[' ) {
-            $re = qr{ \A (\[) \s (.*) \z }xms;
-            $tag = 'thead';
-        }
-        elsif ( $type eq ']' ) {
-            $re = qr{ \A (\]) \s (.*) \z }xms;
-            $tag = 'tfoot';
-        }
-        elsif ( $type eq '-' ) {
-            $re = qr{ \A (\-) \s (.*) \z }xms;
-            $tag = 'tbody';
-        }
-        else {
-            return '';
+        if ( $cur_type ne $type ) {
+            $html .= "  </$lut->{table}{$cur_type}>\n" if $cur_type ne '';
+            $cur_type = $type;
+            $html .= "  <$lut->{table}{$type}>\n";
         }
 
-        $html .= "  <$tag>\n";
-        unshift @lines, $line;
-        THIS: while ( my $line = shift @lines ) {
-            my ($type, $rest) = $line =~ $re;
-            unless ( defined $type ) {
-                unshift @lines, $line;
-                last THIS;
-            }
-            $html .= $class->table_cells( $rest );
-        }
-        $html .= "  </$tag>\n";
+        $html .= $class->table_cells( $rest );
     }
+    $html .= "  </$lut->{table}{$cur_type}>\n";
     $html .= "</table>\n";
     return $html;
 }
