@@ -190,45 +190,34 @@ sub table {
 
         return unless defined $type;
 
+        my ($re, $tag);
         if ( $type eq '[' ) {
-            $html .= "  <thead>\n";
-            unshift @lines, $line;
-            THIS: while ( my $line = shift @lines ) {
-                my ($type, $rest) = $line =~ m{ \A (\[) \s (.*) \z }xms;
-                unless ( defined $type ) {
-                    unshift @lines, $line;
-                    last THIS;
-                }
-                $html .= $class->table_cells( $rest );
-            }
-            $html .= "  </thead>\n";
+            $re = qr{ \A (\[) \s (.*) \z }xms;
+            $tag = 'thead';
         }
         elsif ( $type eq ']' ) {
-            $html .= "  <tfoot>\n";
-            unshift @lines, $line;
-            THIS: while ( my $line = shift @lines ) {
-                my ($type, $rest) = $line =~ m{ \A (\]) \s (.*) \z }xms;
-                unless ( defined $type ) {
-                    unshift @lines, $line;
-                    last THIS;
-                }
-                $html .= $class->table_cells( $rest );
-            }
-            $html .= "  </tfoot>\n";
+            $re = qr{ \A (\]) \s (.*) \z }xms;
+            $tag = 'tfoot';
+        }
+        elsif ( $type eq '-' ) {
+            $re = qr{ \A (\-) \s (.*) \z }xms;
+            $tag = 'tbody';
         }
         else {
-            $html .= "  <tbody>\n";
-            unshift @lines, $line;
-            THIS: while ( my $line = shift @lines ) {
-                my ($type, $rest) = $line =~ m{ \A (\-) \s (.*) \z }xms;
-                unless ( defined $type ) {
-                    unshift @lines, $line;
-                    last THIS;
-                }
-                $html .= $class->table_cells( $rest );
-            }
-            $html .= "  </tbody>\n";
+            return '';
         }
+
+        $html .= "  <$tag>\n";
+        unshift @lines, $line;
+        THIS: while ( my $line = shift @lines ) {
+            my ($type, $rest) = $line =~ $re;
+            unless ( defined $type ) {
+                unshift @lines, $line;
+                last THIS;
+            }
+            $html .= $class->table_cells( $rest );
+        }
+        $html .= "  </$tag>\n";
     }
     $html .= "</table>\n";
     return $html;
