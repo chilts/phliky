@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 12;
+plan tests => 14;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -134,6 +134,68 @@ $text = <<'EOF';
 ### 1.1.1
 EOF
 $html_exp = "<ol><li>1<ol><li><ol><li>1.1.1</li></ol></li></ol></li></ol>";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, $name);
+
+## ----------------------------------------------------------------------------
+
+$name = 'a simple table 1';
+$text = <<'EOF';
+[ Drink | Cups Per Day
+EOF
+$html_exp = << 'EOF';
+<table>
+  <thead>
+    <tr>
+      <td>Drink</td>
+      <td>Cups Per Day</td>
+    </tr>
+  </thead>
+</table>
+EOF
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, $name);
+
+## ----------------------------------------------------------------------------
+
+$name = 'a less simple table';
+$text = <<'EOF';
+[ Drink | Cups Per Day
+] Totals | 6
+- Orange | 1
+- Coffee | 2
+- Tea | 3
+EOF
+$html_exp = << 'EOF';
+<table>
+  <thead>
+    <tr>
+      <td>Drink</td>
+      <td>Cups Per Day</td>
+    </tr>
+  </thead>
+  <tfoot>
+    <tr>
+      <td>Totals</td>
+      <td>6</td>
+    </tr>
+  </tfoot>
+  <tbody>
+    <tr>
+      <td>Orange</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>Coffee</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>Tea</td>
+      <td>3</td>
+    </tr>
+  </tbody>
+</table>
+EOF
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 

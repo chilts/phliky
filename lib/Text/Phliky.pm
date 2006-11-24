@@ -85,6 +85,10 @@ sub parse_chunk {
         # a definition list
         return $class->definition( $1 );
     }
+    elsif ( $chunk =~ m{ \A (\[) \s .* \z }xms ) {
+        # a table
+        return $class->table( $chunk );
+    }
     else {
         # unknown chunk style, output as normal
         return "<p>" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";
@@ -104,7 +108,7 @@ sub list {
     my $indent = [];
 
     foreach my $line (@lines) {
-        my ($type, $length, $content) = $class->line_info( $line );
+        my ($type, $length, $content) = $class->list_line_info( $line );
 
         if ( $length == @$indent ) {
             $html .= "</li><li>" . $class->parse_inline( $class->esc($content) );
@@ -136,7 +140,7 @@ sub list {
     return $html;
 }
 
-sub line_info {
+sub list_line_info {
     my ($class, $line) = @_;
 
     return unless defined $line;
@@ -164,6 +168,81 @@ sub definition {
         $html .= "  <dd>" . $class->esc($dd) . "</dd>\n";
     }
     $html .= "</dl>\n";
+    return $html;
+}
+
+sub table {
+    my ($class, $chunk) = @_;
+
+    # make the para into lines
+    my @lines = split m{\n}xms, $chunk;
+
+    return '' unless @lines;
+
+    my $html = '';
+    my $indent = [];
+
+    $html .= "<table>\n";
+
+  TOP:
+    while ( my $line = shift @lines ) {
+        my ($type, $rest) = $line =~ m{ \A ([\[\]\-]) \s (.*) \z }xms;
+
+        return unless defined $type;
+
+        if ( $type eq '[' ) {
+            $html .= "  <thead>\n";
+            unshift @lines, $line;
+            THIS: while ( my $line = shift @lines ) {
+                my ($type, $rest) = $line =~ m{ \A (\[) \s (.*) \z }xms;
+                unless ( defined $type ) {
+                    unshift @lines, $line;
+                    last THIS;
+                }
+                $html .= $class->table_cells( $rest );
+            }
+            $html .= "  </thead>\n";
+        }
+        elsif ( $type eq ']' ) {
+            $html .= "  <tfoot>\n";
+            unshift @lines, $line;
+            THIS: while ( my $line = shift @lines ) {
+                my ($type, $rest) = $line =~ m{ \A (\]) \s (.*) \z }xms;
+                unless ( defined $type ) {
+                    unshift @lines, $line;
+                    last THIS;
+                }
+                $html .= $class->table_cells( $rest );
+            }
+            $html .= "  </tfoot>\n";
+        }
+        else {
+            $html .= "  <tbody>\n";
+            unshift @lines, $line;
+            THIS: while ( my $line = shift @lines ) {
+                my ($type, $rest) = $line =~ m{ \A (\-) \s (.*) \z }xms;
+                unless ( defined $type ) {
+                    unshift @lines, $line;
+                    last THIS;
+                }
+                $html .= $class->table_cells( $rest );
+            }
+            $html .= "  </tbody>\n";
+        }
+    }
+    $html .= "</table>\n";
+    return $html;
+}
+
+sub table_cells {
+    my ($class, $line) = @_;
+
+    my $html = "    <tr>\n";
+    my @cells = split m{ \s \| \s }xms, $line;
+    for my $cell ( @cells ) {
+        $html .= "      <td>" . $class->parse_inline($cell) . "</td>\n";
+    }
+    $html .= "    </tr>\n";
     return $html;
 }
 
