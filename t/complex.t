@@ -32,7 +32,7 @@ This is a paragraph which has \b{bold} and \i{italic}. Also, we have a pre parag
 
 !2 The End
 
-And we're done.
+And we are done.
 
 (Ends)
 EOF
@@ -45,7 +45,7 @@ $html_exp =<<'EOF';
  which outputs the same.
 </pre>
 <h2>The End</h2>
-<p>And we're done.</p>
+<p>And we are done.</p>
 <p>(Ends)</p>
 EOF
 
