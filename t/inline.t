@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 7;
+plan tests => 9;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -74,5 +74,21 @@ $text = "\\a{<*OMG*>|<Oh My God>}";
 $html_exp = "<p><acronym title=\"&lt;Oh My God&gt;\">&lt;*OMG*&gt;</acronym></p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'abbreviation 2');
+
+## ----------------------------------------------------------------------------
+# br
+
+$text = "Line One\\br{Horizontal Rule}Line Two";
+$html_exp = "<p>Line One<br />Line Two</p>\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'br');
+
+## ----------------------------------------------------------------------------
+# br2
+
+$text = "Line One\\br{}Line Two";
+$html_exp = "<p>Line One<br />Line Two</p>\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'br2');
 
 ## ----------------------------------------------------------------------------

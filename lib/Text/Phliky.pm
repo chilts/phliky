@@ -256,10 +256,12 @@ sub parse_inline {
             my ($abbr, $abbreviation) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
             $line =~ s{ \\a ($RE{balanced}{-parens=>'{}'}) }{<acronym title="$abbreviation">$abbr</acronym>}xms;
         }
+        elsif ( $type eq 'br' ) {
+            $line =~ s{ \\br ($RE{balanced}{-parens=>'{}'}) }{<br />}xms;
+        }
         elsif ( exists $entity->{$type} ) {
             $line =~ s{ \\$type ($RE{balanced}{-parens=>'{}'}) }{$entity->{$type}}xms;
         }
-
         else {
             $line =~ s{ \\([a-z]*) ($RE{balanced}{-parens=>'{}'}) }{\\[$1]{$str}}xms;
         }
