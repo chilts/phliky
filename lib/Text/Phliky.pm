@@ -97,6 +97,10 @@ sub parse_chunk {
         # a table
         return $class->table( $chunk );
     }
+    elsif ( $chunk =~ m{ \A (\-) \s .* \z }xms ) {
+        # a horizontal rule
+        return "<hr />";
+    }
     else {
         # unknown chunk style, output as normal
         return "<p>" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";

@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 14;
+plan tests => 15;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -196,6 +196,14 @@ $html_exp = << 'EOF';
   </tbody>
 </table>
 EOF
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, $name);
+
+## ----------------------------------------------------------------------------
+
+$name = 'horizontal rule';
+$text = '- a horizontal rule';
+$html_exp = "<hr />";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
