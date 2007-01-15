@@ -208,7 +208,7 @@ sub table {
             $html .= "  <$lut->{table}{$type}>\n";
         }
 
-        $html .= $class->table_cells( $rest );
+        $html .= $class->table_cells( $rest, $cur_type eq '[' ? 'th' : 'td' );
     }
     $html .= "  </$lut->{table}{$cur_type}>\n";
     $html .= "</table>\n";
@@ -216,12 +216,12 @@ sub table {
 }
 
 sub table_cells {
-    my ($class, $line) = @_;
+    my ($class, $line, $tag) = @_;
 
     my $html = "    <tr>\n";
     my @cells = split m{ \s \| \s }xms, $line;
     for my $cell ( @cells ) {
-        $html .= "      <td>" . $class->parse_inline($cell) . "</td>\n";
+        $html .= "      <$tag>" . $class->parse_inline($cell) . "</$tag>\n";
     }
     $html .= "    </tr>\n";
     return $html;
@@ -247,6 +247,9 @@ sub parse_inline {
         elsif ( $type eq 'l' ) {
             my ($text, $href) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
             $line =~ s{ \\l ($RE{balanced}{-parens=>'{}'}) }{<a href="$href">$text</a>}xms;
+        }
+        elsif ( $type eq 'h' ) {
+            $line =~ s{ \\h ($RE{balanced}{-parens=>'{}'}) }{<a href="$str">$str</a>}xms;
         }
         elsif ( $type eq 'p' ) {
             my ($text, $href) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;

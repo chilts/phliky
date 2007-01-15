@@ -147,8 +147,8 @@ $html_exp = << 'EOF';
 <table>
   <thead>
     <tr>
-      <td>Drink</td>
-      <td>Cups Per Day</td>
+      <th>Drink</th>
+      <th>Cups Per Day</th>
     </tr>
   </thead>
 </table>
@@ -170,8 +170,8 @@ $html_exp = << 'EOF';
 <table>
   <thead>
     <tr>
-      <td>Drink</td>
-      <td>Cups Per Day</td>
+      <th>Drink</th>
+      <th>Cups Per Day</th>
     </tr>
   </thead>
   <tfoot>
