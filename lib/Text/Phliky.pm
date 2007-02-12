@@ -21,16 +21,26 @@ my $lut = {
         ']' => 'tfoot',
         '-' => 'tbody',
     },
+    mode => {
+        basic => 1,
+        normal => 1,
+    },
 };
 
-Text::Phliky->mk_accessors(qw(text));
+Text::Phliky->mk_accessors(qw(text mode));
 
 ## ----------------------------------------------------------------------------
 # class functions
 
-sub esc {
-    my ($class, $text) = @_;
-    return encode_entities($text);
+sub new {
+    my ($class, $args) = @_;
+
+    my $self = {};
+    bless $self, ref $class || $class;
+
+    $self->{mode} = $args->{mode} || 'normal';
+
+    return $self;
 }
 
 sub uri {
@@ -42,15 +52,34 @@ sub uri {
 # instance methods
 
 sub html {
-    my ($self, $class) = @_;
+    my ($self) = @_;
     return $self->text2html( $self->{text} );
+}
+
+sub mode {
+    my ($self, $mode) = @_;
+    if ( exists $lut->{mode}{$mode} ) {
+        $self->mode();
+    }
+}
+
+sub esc {
+    my ($self, $text) = @_;
+
+    if ( $self->{mode} eq 'basic' ) {
+        return encode_entities($text, '&<>"');
+    }
+    elsif ( $self->{mode} eq 'normal' ) {
+        return encode_entities($text);
+    }
+    return '';
 }
 
 ## ----------------------------------------------------------------------------
 # class methods
 
 sub text2html {
-    my ($class, $text) = @_;
+    my ($self, $text) = @_;
     return unless defined $text;
 
     chomp $text;
@@ -58,27 +87,27 @@ sub text2html {
     my @html;
     my @chunks = split /\n\n+/, $text;
     foreach my $chunk ( @chunks ) {
-        push @html, $class->parse_chunk( $chunk );
+        push @html, $self->parse_chunk( $chunk );
     }
 
     return join '', @html;
 }
 
 sub parse_chunk {
-    my ($class, $chunk) = @_;
+    my ($self, $chunk) = @_;
     if ( $chunk =~ m{ \A \!([123456]) \s (.*) \z }xms ) {
         # headings
         $chunk = $2;
-        return "<h$1>" . $class->esc($chunk) . "</h$1>\n";
+        return "<h$1>" . $self->esc($chunk) . "</h$1>\n";
     }
     elsif ( $chunk =~ m{ \A \s }xms ) {
         # pre-formatted text
-        return "<pre>\n" . $class->esc($chunk) . "\n</pre>\n";
+        return "<pre>\n" . $self->esc($chunk) . "\n</pre>\n";
     }
     elsif ( $chunk =~ m{ \A \^ \s (.*) \z }xms ) {
         # a centered paragraph
         $chunk = $1;
-        return "<p style=\"text-align: center;\">" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";
+        return "<p style=\"text-align: center;\">" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
     }
     elsif ( $chunk =~ m{ \A < \s (.*) \z }xms ) {
         # just a HTML paragraph
@@ -87,15 +116,15 @@ sub parse_chunk {
     }
     elsif ( $chunk =~ m{ \A ([\#\*]) \s .* \z }xms ) {
         # a list of some sort
-        return $class->list( $chunk );
+        return $self->list( $chunk );
     }
     elsif ( $chunk =~ m{ \A : \s (.*) \z }xms ) {
         # a definition list
-        return $class->definition( $1 );
+        return $self->definition( $1 );
     }
     elsif ( $chunk =~ m{ \A (\[) \s .* \z }xms ) {
         # a table
-        return $class->table( $chunk );
+        return $self->table( $chunk );
     }
     elsif ( $chunk =~ m{ \A (\-) \s .* \z }xms ) {
         # a horizontal rule
@@ -103,13 +132,13 @@ sub parse_chunk {
     }
     else {
         # unknown chunk style, output as normal
-        return "<p>" . $class->parse_inline( $class->esc($chunk) ) . "</p>\n";
+        return "<p>" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
     }
     return "[program error]";
 }
 
 sub list {
-    my ($class, $chunk) = @_;
+    my ($self, $chunk) = @_;
 
     # make the para into lines
     my @lines = split m{\n}xms, $chunk;
@@ -120,22 +149,22 @@ sub list {
     my $indent = [];
 
     foreach my $line (@lines) {
-        my ($type, $length, $content) = $class->list_line_info( $line );
+        my ($type, $length, $content) = $self->list_line_info( $line );
 
         if ( $length == @$indent ) {
-            $html .= "</li><li>" . $class->parse_inline( $class->esc($content) );
+            $html .= "</li><li>" . $self->parse_inline( $self->esc($content) );
         }
         elsif ( $length == scalar @$indent+1 ) {
             # $html .= "</li>" unless @$indent == 0;
             push @$indent, $type;
-            $html .= "<$type><li>" . $class->parse_inline( $class->esc($content) );
+            $html .= "<$type><li>" . $self->parse_inline( $self->esc($content) );
         }
         elsif ( $length < @$indent ) {
             until ( $length == @$indent ) {
                 my $t = pop @$indent;
                 $html .= "</li></$t>";
             }
-            $html .= "</li><li>" . $class->parse_inline( $class->esc($content) );
+            $html .= "</li><li>" . $self->parse_inline( $self->esc($content) );
         }
         else {
             # croak "You can't indent lists by more than one at a time";
@@ -143,7 +172,7 @@ sub list {
                 push @$indent, $type;
                 $html .= "<$type><li>";
             }
-            $html .= $class->parse_inline( $class->esc($content) );
+            $html .= $self->parse_inline( $self->esc($content) );
         }
     }
     while ( my $t = pop @$indent ) {
@@ -153,7 +182,7 @@ sub list {
 }
 
 sub list_line_info {
-    my ($class, $line) = @_;
+    my ($self, $line) = @_;
 
     return unless defined $line;
 
@@ -165,7 +194,7 @@ sub list_line_info {
 }
 
 sub definition {
-    my ($class, $chunk) = @_;
+    my ($self, $chunk) = @_;
 
     # make the para into lines
     my @lines = split m{\n}xms, $chunk;
@@ -176,15 +205,15 @@ sub definition {
     foreach my $line (@lines) {
         my ($dt, $dd) = $line =~ m{ \A ([^:]+): \s (.*) \z }xms;
         next unless defined $dt and defined $dd;
-        $html .= "  <dt>" . $class->esc($dt) . "</dt>\n";
-        $html .= "  <dd>" . $class->esc($dd) . "</dd>\n";
+        $html .= "  <dt>" . $self->esc($dt) . "</dt>\n";
+        $html .= "  <dd>" . $self->esc($dd) . "</dd>\n";
     }
     $html .= "</dl>\n";
     return $html;
 }
 
 sub table {
-    my ($class, $chunk) = @_;
+    my ($self, $chunk) = @_;
 
     # make the para into lines
     my @lines = split m{\n}xms, $chunk;
@@ -208,7 +237,7 @@ sub table {
             $html .= "  <$lut->{table}{$type}>\n";
         }
 
-        $html .= $class->table_cells( $rest, $cur_type eq '[' ? 'th' : 'td' );
+        $html .= $self->table_cells( $rest, $cur_type eq '[' ? 'th' : 'td' );
     }
     $html .= "  </$lut->{table}{$cur_type}>\n";
     $html .= "</table>\n";
@@ -216,19 +245,19 @@ sub table {
 }
 
 sub table_cells {
-    my ($class, $line, $tag) = @_;
+    my ($self, $line, $tag) = @_;
 
     my $html = "    <tr>\n";
     my @cells = split m{ \s \| \s }xms, $line;
     for my $cell ( @cells ) {
-        $html .= "      <$tag>" . $class->parse_inline($cell) . "</$tag>\n";
+        $html .= "      <$tag>" . $self->parse_inline($cell) . "</$tag>\n";
     }
     $html .= "    </tr>\n";
     return $html;
 }
 
 sub parse_inline {
-    my ($class, $line) = @_;
+    my ($self, $line) = @_;
     # do stuff
     while ( my ($type, $str) = $line =~ m{ \\([a-z]*)($RE{balanced}{-parens=>'{}'}) }xms ) {
         # remove leading/trailing whitespace
