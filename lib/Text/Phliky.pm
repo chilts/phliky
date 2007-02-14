@@ -109,6 +109,12 @@ sub parse_chunk {
         $chunk = $1;
         return "<p style=\"text-align: center;\">" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
     }
+    elsif ( $chunk =~ m{ \A ~{(\w+)} \s (.*) \z }xms ) {
+        # a paragraph with a class
+        my $class = $1;
+        $chunk = $2;
+        return "<p class=\"$class\">" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
+    }
     elsif ( $chunk =~ m{ \A < \s (.*) \z }xms ) {
         # just a HTML paragraph
         $chunk = $1;
