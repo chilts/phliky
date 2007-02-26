@@ -20,7 +20,7 @@ my $phliky = Text::Phliky->new();
 my ($text, $html_exp, $html_got, $name);
 
 ## ----------------------------------------------------------------------------
-# centered
+# paragraph with a class
 
 $text = "~{small} a quote";
 $html_exp = "<p class=\"small\">a quote</p>\n";
