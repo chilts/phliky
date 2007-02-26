@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+## -------------------------------------------------------------------*-perl-*-
+
+use strict;
+use warnings;
+use File::Slurp;
+use Text::Phliky;
+
+## ----------------------------------------------------------------------------
+
+unless ( @ARGV == 1 ) {
+    usage();
+    exit 2;
+}
+
+my ($filename) = @ARGV;
+my $text = read_file( $filename );
+
+my $phliky = Text::Phliky->new();
+my $html = $phliky->text2html( $text );
+
+print $html;
+
+## ----------------------------------------------------------------------------
+
+sub usage {
+    print <<"EOF";
+Usage: $0 <file>
+EOF
+}
+
+## ----------------------------------------------------------------------------
