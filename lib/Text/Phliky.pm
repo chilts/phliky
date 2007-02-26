@@ -98,10 +98,17 @@ sub text2html {
 
 sub parse_chunk {
     my ($self, $chunk) = @_;
-    if ( $chunk =~ m{ \A \!([123456]) \s (.*) \z }xms ) {
+    if ( $chunk =~ m{ \A \!([123456])(?:{([\w-]+)})? \s (.*) \z }xms ) {
         # headings
-        $chunk = $2;
-        return "<h$1>" . $self->esc($chunk) . "</h$1>\n";
+        my $level = $1;
+        my $name = $2;
+        $chunk = $3;
+
+        my $html = "<h$1>" . $self->esc($chunk) . "</h$1>\n";
+        if ( defined $name ) {
+            $html .= '<a name="' . $self->esc($name) . "\"> </a>\n";
+        }
+        return $html;
     }
     elsif ( $chunk =~ m{ \A \s }xms ) {
         # pre-formatted text
