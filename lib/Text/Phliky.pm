@@ -104,10 +104,11 @@ sub parse_chunk {
         my $name = $2;
         $chunk = $3;
 
-        my $html = "<h$1>" . $self->esc($chunk) . "</h$1>\n";
+        my $html = '';
         if ( defined $name ) {
             $html .= '<a name="' . $self->esc($name) . "\"> </a>\n";
         }
+        $html .= "<h$1>" . $self->esc($chunk) . "</h$1>\n";
         return $html;
     }
     elsif ( $chunk =~ m{ \A \s }xms ) {
