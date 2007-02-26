@@ -84,6 +84,9 @@ sub text2html {
 
     chomp $text;
 
+    # join lines up which should be together
+    $text =~ s{ \\\n\s+ }{ }gxms;
+
     my @html;
     my @chunks = split /\n\n+/, $text;
     foreach my $chunk ( @chunks ) {
@@ -254,7 +257,7 @@ sub table_cells {
     my ($self, $line, $tag) = @_;
 
     my $html = "    <tr>\n";
-    my @cells = split m{ \s \| \s }xms, $line;
+    my @cells = split m{ \s+ \| \s+ }xms, $line;
     for my $cell ( @cells ) {
         $html .= "      <$tag>" . $self->parse_inline($cell) . "</$tag>\n";
     }
@@ -275,6 +278,9 @@ sub parse_inline {
         }
         elsif ( $type eq 'i' ) {
             $line =~ s{ \\i ($RE{balanced}{-parens=>'{}'}) }{<em>$str</em>}xms;
+        }
+        elsif ( $type eq 'u' ) {
+            $line =~ s{ \\u ($RE{balanced}{-parens=>'{}'}) }{<span style="text-decoration: underline;">$str</span>}xms;
         }
         elsif ( $type eq 'c' ) {
             $line =~ s{ \\c ($RE{balanced}{-parens=>'{}'}) }{<code>$str</code>}xms;

@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 10;
+plan tests => 11;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -32,6 +32,14 @@ is($html_got, $html_exp, 'bold');
 
 $text = "To \\i{emphasize}.";
 $html_exp = "<p>To <em>emphasize</em>.</p>\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'emphasis');
+
+## ----------------------------------------------------------------------------
+# underline
+
+$text = "To \\u{underline}.";
+$html_exp = "<p>To <span style=\"text-decoration: underline;\">underline</span>.</p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'emphasis');
 
