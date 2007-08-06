@@ -105,7 +105,7 @@ is($html_got, $html_exp, 'br2');
 $text = "A link \\h{http://www.kiwiwriters.org/} here";
 $html_exp = "<p>A link <a href=\"http://www.kiwiwriters.org/\">http://www.kiwiwriters.org/</a> here</p>\n";
 $html_got = $phliky->text2html( $text );
-is($html_got, $html_exp, 'br2');
+is($html_got, $html_exp, 'h');
 
 ## ----------------------------------------------------------------------------
 # w
