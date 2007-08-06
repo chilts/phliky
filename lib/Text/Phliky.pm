@@ -297,6 +297,9 @@ sub parse_inline {
             my ($text, $href) = $str =~ m{ \A ([^\|]*) \| (.*) \z }xms;
             $line =~ s{ \\l ($RE{balanced}{-parens=>'{}'}) }{<a href="$href">$text</a>}xms;
         }
+        elsif ( $type eq 'w' ) {
+            $line =~ s{ \\w ($RE{balanced}{-parens=>'{}'}) }{<a href="$str.html">$str</a>}xms;
+        }
         elsif ( $type eq 'h' ) {
             $line =~ s{ \\h ($RE{balanced}{-parens=>'{}'}) }{<a href="$str">$str</a>}xms;
         }
