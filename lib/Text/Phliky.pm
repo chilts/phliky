@@ -148,9 +148,9 @@ sub parse_chunk {
         return "<hr />";
     }
     elsif ( $chunk =~ m{ \A \" \s (.*) \z }xms ) {
-        # a quote
+        # a blockquote
         $chunk = $1;
-        return "<quote>" . $self->parse_inline( $self->esc($chunk) ) . "</quote>\n";
+        return "<blockquote>" . $self->parse_inline( $self->esc($chunk) ) . "</blockquote>\n";
     }
     else {
         # unknown chunk style, output as normal

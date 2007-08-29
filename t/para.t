@@ -38,15 +38,15 @@ is($html_got, $html_exp, 'html text');
 ## ----------------------------------------------------------------------------
 # quote
 
-$text = '" a quote';
-$html_exp = "<quote>a quote</quote>\n";
+$text = '" a blockquote';
+$html_exp = "<blockquote>a blockquote</blockquote>\n";
 $html_got = $phliky->text2html( $text );
-is($html_got, $html_exp, 'quote');
+is($html_got, $html_exp, 'blockquote');
 
-$text = '" "a quote"';
-$html_exp = "<quote>&quot;a quote&quot;</quote>\n";
+$text = '" "a blockquote"';
+$html_exp = "<blockquote>&quot;a blockquote&quot;</blockquote>\n";
 $html_got = $phliky->text2html( $text );
-is($html_got, $html_exp, 'quote 2');
+is($html_got, $html_exp, 'blockquote 2');
 
 ## ----------------------------------------------------------------------------
 
