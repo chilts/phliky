@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 15;
+plan tests => 17;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -22,8 +22,8 @@ my ($text, $html_exp, $html_got, $name);
 ## ----------------------------------------------------------------------------
 # centered
 
-$text = "^ a quote";
-$html_exp = "<p style=\"text-align: center;\">a quote</p>\n";
+$text = "^ a centered";
+$html_exp = "<p style=\"text-align: center;\">a centered</p>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'centered');
 
@@ -34,6 +34,19 @@ $text = "< &copy; 2006 <b>Andrew Chilton</b>";
 $html_exp = "&copy; 2006 <b>Andrew Chilton</b>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'html text');
+
+## ----------------------------------------------------------------------------
+# quote
+
+$text = '" a quote';
+$html_exp = "<quote>a quote</quote>\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'quote');
+
+$text = '" "a quote"';
+$html_exp = "<quote>&quot;a quote&quot;</quote>\n";
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'quote 2');
 
 ## ----------------------------------------------------------------------------
 

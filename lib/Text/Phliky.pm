@@ -147,6 +147,11 @@ sub parse_chunk {
         # a horizontal rule
         return "<hr />";
     }
+    elsif ( $chunk =~ m{ \A \" \s (.*) \z }xms ) {
+        # a quote
+        $chunk = $1;
+        return "<quote>" . $self->parse_inline( $self->esc($chunk) ) . "</quote>\n";
+    }
     else {
         # unknown chunk style, output as normal
         return "<p>" . $self->parse_inline( $self->esc($chunk) ) . "</p>\n";
