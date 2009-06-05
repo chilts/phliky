@@ -27,14 +27,8 @@ $text = "An ' apostrophe";
 if ( $HTML::Entities::VERSION eq '1.29' ) {
     $html_exp = "<p>An ' apostrophe</p>\n";
 }
-elsif ( $HTML::Entities::VERSION eq '1.32' ) {
-    $html_exp = "<p>An &#39; apostrophe</p>\n";
-}
-elsif ( $HTML::Entities::VERSION eq '1.35' ) {
-    $html_exp = "<p>An &#39; apostrophe</p>\n";
-}
 else {
-    $html_exp = "<p>An ' apostrophe</p>\n";
+    $html_exp = "<p>An &#39; apostrophe</p>\n";
 }
 
 $html_got = $phliky->text2html( $text );
