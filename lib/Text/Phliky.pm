@@ -173,6 +173,12 @@ sub list {
     foreach my $line (@lines) {
         my ($type, $length, $content) = $self->list_line_info( $line );
 
+        unless ( defined $type and defined $length ) {
+            $html .= ' ';
+            $html .= $self->parse_inline( $self->esc($content) );
+            next;
+        }
+
         if ( $length == @$indent ) {
             $html .= "</li><li>" . $self->parse_inline( $self->esc($content) );
         }
@@ -208,7 +214,13 @@ sub list_line_info {
 
     return unless defined $line;
 
-    my ($type, $content) = $line =~ m{ \A ([\#\*]*) \s (.*) \z }xms;
+    my ($type, $content) = $line =~ m{ \A ([\#\*]+) \s (.*) \z }xms;
+    unless ( defined $type and defined $content ) {
+        print "line=$line\n";
+        $line =~ s{ \A \s* }{}gxms;
+        return (undef, undef, $line);
+    }
+
     my $length = length $type;
     $type = substr($type, 0, 1) eq '#' ? 'ol' : 'ul';
 
