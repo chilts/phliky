@@ -40,7 +40,13 @@ is($html_got, $html_exp, $name);
 
 $name = 'A small list';
 $text = "* a list\nwith extra lines\n* another\npoint\n* some\nmore\nlines";
-$html_exp = "<ul>\n<li>a list with extra lines</li>\n<li>another point</li>\n<li>some more lines</li>\n</ul>\n";
+$html_exp = <<'EOF';
+<ul>
+<li>a list with extra lines</li>
+<li>another point</li>
+<li>some more lines</li>
+</ul>
+EOF
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
@@ -49,7 +55,13 @@ is($html_got, $html_exp, $name);
 
 $name = 'A small list';
 $text = "* a list\n  with extra lines\n* another\n  point\n* some\n  more\n  lines";
-$html_exp = "<ul>\n<li>a list with extra lines</li>\n<li>another point</li>\n<li>some more lines</li>\n</ul>\n";
+$html_exp = <<'EOF';
+<ul>
+<li>a list with extra lines</li>
+<li>another point</li>
+<li>some more lines</li>
+</ul>
+EOF
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
@@ -58,7 +70,16 @@ is($html_got, $html_exp, $name);
 
 $name = 'A small list';
 $text = "* a list\nwith extra lines\n** another\npoint\n* some\nmore\nlines";
-$html_exp = "<ul>\n<li>a list with extra lines\n<ul>\n<li>another point</li>\n</ul>\n</li>\n<li>some more lines</li>\n</ul>\n";
+$html_exp = <<'EOF';
+<ul>
+<li>a list with extra lines
+<ul>
+<li>another point</li>
+</ul>
+</li>
+<li>some more lines</li>
+</ul>
+EOF
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
