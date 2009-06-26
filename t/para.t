@@ -104,7 +104,7 @@ is($html_got, $html_exp, $name);
 
 $name = 'horizontal rule';
 $text = '- a horizontal rule';
-$html_exp = "<hr />";
+$html_exp = "<hr />\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 

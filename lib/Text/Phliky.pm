@@ -145,7 +145,7 @@ sub parse_chunk {
     }
     elsif ( $chunk =~ m{ \A (\-) \s .* \z }xms ) {
         # a horizontal rule
-        return "<hr />";
+        return "<hr />\n";
     }
     elsif ( $chunk =~ m{ \A \" \s (.*) \z }xms ) {
         # a blockquote
@@ -180,31 +180,31 @@ sub list {
         }
 
         if ( $length == @$indent ) {
-            $html .= "</li><li>" . $self->parse_inline( $self->esc($content) );
+            $html .= "</li>\n<li>" . $self->parse_inline( $self->esc($content) );
         }
         elsif ( $length == scalar @$indent+1 ) {
             # $html .= "</li>" unless @$indent == 0;
             push @$indent, $type;
-            $html .= "<$type><li>" . $self->parse_inline( $self->esc($content) );
+            $html .= "\n<$type>\n<li>" . $self->parse_inline( $self->esc($content) );
         }
         elsif ( $length < @$indent ) {
             until ( $length == @$indent ) {
                 my $t = pop @$indent;
-                $html .= "</li></$t>";
+                $html .= "</li>\n</$t>\n";
             }
-            $html .= "</li><li>" . $self->parse_inline( $self->esc($content) );
+            $html .= "</li>\n<li>" . $self->parse_inline( $self->esc($content) );
         }
         else {
             # croak "You can't indent lists by more than one at a time";
             until ( @$indent == $length) {
                 push @$indent, $type;
-                $html .= "<$type><li>";
+                $html .= "\n<$type>\n<li>";
             }
             $html .= $self->parse_inline( $self->esc($content) );
         }
     }
     while ( my $t = pop @$indent ) {
-        $html .= "</li></$t>";
+        $html .= "</li>\n</$t>\n";
     }
     return $html;
 }
@@ -216,7 +216,6 @@ sub list_line_info {
 
     my ($type, $content) = $line =~ m{ \A ([\#\*]+) \s (.*) \z }xms;
     unless ( defined $type and defined $content ) {
-        print "line=$line\n";
         $line =~ s{ \A \s* }{}gxms;
         return (undef, undef, $line);
     }
