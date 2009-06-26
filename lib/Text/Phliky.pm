@@ -183,9 +183,10 @@ sub list {
             $html .= "</li>\n<li>" . $self->parse_inline( $self->esc($content) );
         }
         elsif ( $length == scalar @$indent+1 ) {
-            # $html .= "</li>" unless @$indent == 0;
             push @$indent, $type;
-            $html .= "\n<$type>\n<li>" . $self->parse_inline( $self->esc($content) );
+            # add a \n unless this is the first one
+            $html .= "\n" unless @$indent == 1;
+            $html .= "<$type>\n<li>" . $self->parse_inline( $self->esc($content) );
         }
         elsif ( $length < @$indent ) {
             until ( $length == @$indent ) {

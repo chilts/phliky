@@ -23,8 +23,15 @@ my ($text, $html_exp, $html_got, $name);
 # one item unordered list
 
 $name = 'A small list';
-$text = "* a list\nspread over two lines";
-$html_exp = "\n<ul>\n<li>a list spread over two lines</li>\n</ul>\n";
+$text = <<'EOF';
+* a list
+spread over two lines
+EOF
+$html_exp = <<'EOF';
+<ul>
+<li>a list spread over two lines</li>
+</ul>
+EOF
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
@@ -33,7 +40,7 @@ is($html_got, $html_exp, $name);
 
 $name = 'A small list';
 $text = "* a list\nwith extra lines\n* another\npoint\n* some\nmore\nlines";
-$html_exp = "\n<ul>\n<li>a list with extra lines</li>\n<li>another point</li>\n<li>some more lines</li>\n</ul>\n";
+$html_exp = "<ul>\n<li>a list with extra lines</li>\n<li>another point</li>\n<li>some more lines</li>\n</ul>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
@@ -42,7 +49,7 @@ is($html_got, $html_exp, $name);
 
 $name = 'A small list';
 $text = "* a list\n  with extra lines\n* another\n  point\n* some\n  more\n  lines";
-$html_exp = "\n<ul>\n<li>a list with extra lines</li>\n<li>another point</li>\n<li>some more lines</li>\n</ul>\n";
+$html_exp = "<ul>\n<li>a list with extra lines</li>\n<li>another point</li>\n<li>some more lines</li>\n</ul>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
@@ -51,7 +58,7 @@ is($html_got, $html_exp, $name);
 
 $name = 'A small list';
 $text = "* a list\nwith extra lines\n** another\npoint\n* some\nmore\nlines";
-$html_exp = "\n<ul>\n<li>a list with extra lines\n<ul>\n<li>another point</li>\n</ul>\n</li>\n<li>some more lines</li>\n</ul>\n";
+$html_exp = "<ul>\n<li>a list with extra lines\n<ul>\n<li>another point</li>\n</ul>\n</li>\n<li>some more lines</li>\n</ul>\n";
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
