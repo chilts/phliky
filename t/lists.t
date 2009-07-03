@@ -26,7 +26,7 @@ $name = 'A small list';
 $text = "* a list";
 $html_exp = <<'EOF';
 <ul>
-<li>a list</li>
+  <li>a list</li>
 </ul>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -39,11 +39,11 @@ $name = 'a small nested list';
 $text = "* list\n** sub-list";
 $html_exp = <<'EOF';
 <ul>
-<li>list
-<ul>
-<li>sub-list</li>
-</ul>
-</li>
+  <li>list
+    <ul>
+      <li>sub-list</li>
+    </ul>
+  </li>
 </ul>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -55,8 +55,8 @@ is($html_got, $html_exp, $name);
 $text = "* a list\n* some more";
 $html_exp = <<'EOF';
 <ul>
-<li>a list</li>
-<li>some more</li>
+  <li>a list</li>
+  <li>some more</li>
 </ul>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -69,7 +69,7 @@ $name = 'an ordered list';
 $text = "# a list";
 $html_exp = <<'EOF';
 <ol>
-<li>a list</li>
+  <li>a list</li>
 </ol>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -82,8 +82,8 @@ $name = 'an ordered list';
 $text = "# a list\n# another one";
 $html_exp = <<'EOF';
 <ol>
-<li>a list</li>
-<li>another one</li>
+  <li>a list</li>
+  <li>another one</li>
 </ol>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -99,12 +99,12 @@ $text = <<'EOF';
 EOF
 $html_exp = <<'EOF';
 <ol>
-<li>one
-<ul>
-<li>a</li>
-<li>b</li>
-</ul>
-</li>
+  <li>one
+    <ul>
+      <li>a</li>
+      <li>b</li>
+    </ul>
+  </li>
 </ol>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -120,12 +120,12 @@ $text = <<'EOF';
 EOF
 $html_exp = <<'EOF';
 <ol>
-<li>one
-<ul>
-<li>a</li>
-</ul>
-</li>
-<li>two</li>
+  <li>one
+    <ul>
+      <li>a</li>
+    </ul>
+  </li>
+  <li>two</li>
 </ol>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -143,14 +143,14 @@ $text = <<'EOF';
 EOF
 $html_exp = <<'EOF';
 <ol>
-<li>one</li>
-<li>two
-<ul>
-<li>2a</li>
-<li>2b</li>
-</ul>
-</li>
-<li>three</li>
+  <li>one</li>
+  <li>two
+    <ul>
+      <li>2a</li>
+      <li>2b</li>
+    </ul>
+  </li>
+  <li>three</li>
 </ol>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -166,15 +166,15 @@ $text = <<'EOF';
 EOF
 $html_exp = <<'EOF';
 <ol>
-<li>1
-<ol>
-<li>1.1
-<ol>
-<li>1.1.1</li>
-</ol>
-</li>
-</ol>
-</li>
+  <li>1
+    <ol>
+      <li>1.1
+        <ol>
+          <li>1.1.1</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
 </ol>
 EOF
 $html_got = $phliky->text2html( $text );
@@ -189,15 +189,15 @@ $text = <<'EOF';
 EOF
 $html_exp = <<'EOF';
 <ol>
-<li>1
-<ol>
-<li>
-<ol>
-<li>1.1.1</li>
-</ol>
-</li>
-</ol>
-</li>
+  <li>1
+    <ol>
+      <li>
+        <ol>
+          <li>1.1.1</li>
+        </ol>
+      </li>
+    </ol>
+  </li>
 </ol>
 EOF
 $html_got = $phliky->text2html( $text );

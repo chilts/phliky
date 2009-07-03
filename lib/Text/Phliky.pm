@@ -27,6 +27,8 @@ my $lut = {
     },
 };
 
+my $indent = q{  }; # two spaces
+
 Text::Phliky->mk_accessors(qw(text mode));
 
 ## ----------------------------------------------------------------------------
@@ -168,7 +170,7 @@ sub list {
     return '' unless @lines;
 
     my $html = '';
-    my $indent = [];
+    my $indentation = [];
 
     foreach my $line (@lines) {
         my ($type, $length, $content) = $self->list_line_info( $line );
@@ -179,33 +181,59 @@ sub list {
             next;
         }
 
-        if ( $length == @$indent ) {
-            $html .= "</li>\n<li>" . $self->parse_inline( $self->esc($content) );
+        if ( $length == @$indentation ) {
+            # same level list item
+            $html .= "</li>\n" . ($indent x (@$indentation*2-1)) . "<li>" . $self->parse_inline( $self->esc($content) );
         }
-        elsif ( $length == scalar @$indent+1 ) {
-            push @$indent, $type;
+        elsif ( $length == scalar @$indentation+1 ) {
+            # new list within a <li>
+            $html .= "\n" if @$indentation > 0;
+
+            push @$indentation, $type;
+
             # add a \n unless this is the first one
-            $html .= "\n" unless @$indent == 1;
-            $html .= "<$type>\n<li>" . $self->parse_inline( $self->esc($content) );
+            $html .= $indent x ((@$indentation-1)*2);
+            $html .= "<$type>\n";
+            $html .= $indent x (@$indentation*2-1);
+            $html .= "<li>" . $self->parse_inline( $self->esc($content) );
         }
-        elsif ( $length < @$indent ) {
-            until ( $length == @$indent ) {
-                my $t = pop @$indent;
-                $html .= "</li>\n</$t>\n";
+        elsif ( $length < @$indentation ) {
+            until ( $length == @$indentation ) {
+                my $t = pop @$indentation;
+                $html .= "</li>\n" . ($indent x (@$indentation*2)) . "</$t>\n";
             }
-            $html .= "</li>\n<li>" . $self->parse_inline( $self->esc($content) );
+            $html .= $indent x (@$indentation*2-1);
+            $html .= "</li>\n";
+            $html .= ($indent x @$indentation) . "<li>";
+            $html .= $self->parse_inline( $self->esc($content) );
         }
         else {
-            # croak "You can't indent lists by more than one at a time";
-            until ( @$indent == $length) {
-                push @$indent, $type;
-                $html .= "\n<$type>\n<li>";
+            # lots of indentation at once
+            until ( @$indentation == $length) {
+                $html .= "\n";
+                $html .= ($indent x (@$indentation*2));
+                push @$indentation, $type;
+                $html .= "<$type>\n";
+                $html .= ($indent x (@$indentation*2-1));
+                $html .= "<li>";
             }
             $html .= $self->parse_inline( $self->esc($content) );
         }
     }
-    while ( my $t = pop @$indent ) {
-        $html .= "</li>\n</$t>\n";
+
+    # while we have some indentation left, keep adding closing </li>s and </$type>s
+    if ( @$indentation ) {
+        $html .= "</li>\n";
+        $html .= $indent x ((@$indentation-1)*2) . "</$indentation->[-1]>\n";
+
+        my $t = pop @$indentation;
+    }
+    while ( my $t = pop @$indentation ) {
+        $html .= $indent x (@$indentation*2+1);
+        $html .= "</li>\n";
+
+        # $html .= $indent x (@$indentation);
+        $html .= $indent x (@$indentation*2) . "</$t>\n";
     }
     return $html;
 }
@@ -254,10 +282,7 @@ sub table {
 
     return '' unless @lines;
 
-    my $html = '';
-    my $indent = [];
-
-    $html .= "<table>\n";
+    my $html = "<table>\n";
 
     my $cur_type = '';
     while ( my $line = shift @lines ) {
