@@ -137,6 +137,10 @@ sub parse_chunk {
         # a list of some sort
         return $self->list( $chunk );
     }
+    elsif ( $chunk =~ m{ \A % }xms ) {
+        # a form
+        return $self->form( $chunk );
+    }
     elsif ( $chunk =~ m{ \A : \s (.*) \z }xms ) {
         # a definition list
         return $self->definition( $1 );
@@ -235,6 +239,66 @@ sub list {
         # $html .= $indent x (@$indentation);
         $html .= $indent x (@$indentation*2) . "</$t>\n";
     }
+    return $html;
+}
+
+sub form {
+    my ($self, $chunk) = @_;
+
+    # print qq{chunk=$chunk\n};
+
+    # make the para into lines
+    my @lines = split m{\n}xms, $chunk;
+
+    return '' unless @lines;
+
+    # firstly get the 'action' line (the first line)
+    my ($type, $attr, $action) = $self->parse_generic_line( shift @lines );
+    unless ( defined $type ) {
+        # something wrong since the first line should be a '%'
+        return '';
+    }
+
+    # create the start of the form
+    my $html = qq{<form action="} . $self->esc($action) . q{"};
+    for my $name ( qw(id name method enctype accept) ) {
+        next unless exists $attr->{$name};
+        $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
+    }
+    $html .= qq{>\n};
+
+    # now the rest of the form
+  LINE:
+    foreach my $line (@lines) {
+        my ($type, $attr, $rest) = $self->parse_generic_line( $line );
+
+        unless ( defined $type ) {
+            # just some text
+            $html .= $self->parse_inline( $self->esc($line) ) . qq{\n};
+            next;
+        }
+
+        if ( $type eq '-' ) {
+            $html .= qq{<br />\n};
+            next;
+        }
+
+        if ( $type eq '^' ) {
+            $html .= qq{<input type="text"};
+          NAME:
+            for my $name ( qw(id name) ) {
+                next NAME unless exists $attr->{$name};
+                $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
+            }
+            $html .= qq{ value="} . $self->esc($rest) . qq{"} if defined $rest;
+            $html .= qq{ />\n};
+            next LINE;
+        }
+
+    }
+
+    # close the form off
+    $html .= qq{</form>\n};
     return $html;
 }
 
