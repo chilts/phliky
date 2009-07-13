@@ -371,6 +371,48 @@ sub parse_inline {
     return $line;
 }
 
+sub parse_generic_line {
+    my ($self, $line) = @_;
+
+    # lines are of the form "x{attrs...}? rest"
+    # e.g.
+    #    '^'
+    #    '^ '
+    #    '^{}'
+    #    '^{} '
+    #    '^ the rest'
+    #    '^{} the rest'
+    #    '^{attr=value}'
+    #    '^{attr=value} '
+    #    '^{attr=value|attr2=value2}'
+    #    '^{attr=value} the rest'
+    #    '^{attr=value|attr2=value2} the rest'
+
+    if ( $line =~ m{ \A (.) \s* \z }xms ) {
+        return ($1, {}, undef);
+    }
+    elsif ( $line =~ m{ \A (.) \s+ (.*) \z }xms ) {
+        return ($1, {}, $2);
+    }
+    elsif ( $line =~ m{ \A (.) ($RE{balanced}{-parens=>'{}'}) \s* (.*) \z }xms ) {
+        my $type = $1;
+        my $attributes = $2;
+        my $rest = $3 eq '' ? undef : $3;
+        $attributes = substr $attributes, 1, length($attributes) - 2;
+        my $attr = {};
+        my @pairs = split '\|', $attributes;
+        foreach my $pair ( @pairs ) {
+            my ($key, $value) = split '=', $pair;
+            $attr->{$key} = $value;
+        }
+
+        return ($1, $attr, $rest);
+    }
+
+    # if none of the above, just return the text
+    return (undef, undef, $line);
+}
+
 ## ----------------------------------------------------------------------------
 1;
 ## ----------------------------------------------------------------------------
