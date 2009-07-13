@@ -20,6 +20,7 @@ my $phliky = Text::Phliky->new();
 my ($text, $html_exp, $html_got, $name);
 
 ## ----------------------------------------------------------------------------
+# simple table
 
 $name = 'a simple table 1';
 $text = <<'EOF';
@@ -39,6 +40,7 @@ $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, $name);
 
 ## ----------------------------------------------------------------------------
+# a less simple table
 
 $name = 'a less simple table';
 $text = <<'EOF';
