@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 11;
+plan tests => 12;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -134,6 +134,21 @@ $html_exp = qq{<form action="action.html">
 };
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'form with radio buttons');
+
+## ----------------------------------------------------------------------------
+# form with a button
+
+$text = qq{% action.html
+! A Button
+!{id=button-two} 2nd Button
+};
+$html_exp = qq{<form action="action.html">
+<input type="button" value="A Button" />
+<input type="button" id="button-two" value="2nd Button" />
+</form>
+};
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'form with a submit button');
 
 ## ----------------------------------------------------------------------------
 # form with a submit button
