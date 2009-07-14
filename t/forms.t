@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 8;
+plan tests => 10;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -87,7 +87,6 @@ is($html_got, $html_exp, 'empty form with a <br />');
 ## ----------------------------------------------------------------------------
 # form with text input
 
-print '-' x 79, "\n";
 $text = qq{% action.html
 Firstname:
 ^{name=firstname} Default Value
@@ -105,6 +104,35 @@ Surname:
 };
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'form with text input');
-print '-' x 79, "\n";
+
+## ----------------------------------------------------------------------------
+# form with a checkbox
+
+$text = qq{% action.html
+[{name=vehicle} Bike
+[{id=vehicle-car|name=vehicle} Car
+};
+$html_exp = qq{<form action="action.html">
+<input type="checkbox" name="vehicle" value="Bike" />
+<input type="checkbox" id="vehicle-car" name="vehicle" value="Car" />
+</form>
+};
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'form with checkbox');
+
+## ----------------------------------------------------------------------------
+# form with radio buttons
+
+$text = qq{% action.html
+\@{name=sex} Male
+\@{id=sex-female|name=sex} Female
+};
+$html_exp = qq{<form action="action.html">
+<input type="radio" name="sex" value="Male" />
+<input type="radio" id="sex-female" name="sex" value="Female" />
+</form>
+};
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'form with radio buttons');
 
 ## ----------------------------------------------------------------------------
