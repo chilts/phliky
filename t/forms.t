@@ -106,6 +106,21 @@ $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'form with text input');
 
 ## ----------------------------------------------------------------------------
+# form with textarea
+
+$text = qq{% action.html
+={name=feedback} Something here
+};
+$html_exp = qq{<form action="action.html">
+<textarea name="feedback">
+Something here
+</textarea>
+</form>
+};
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'form with textarea input');
+
+## ----------------------------------------------------------------------------
 # form with a checkbox
 
 $text = qq{% action.html

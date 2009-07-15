@@ -343,6 +343,19 @@ sub form {
             next LINE;
         }
 
+        if ( $type eq '=' ) {
+            $html .= qq{<textarea};
+          NAME:
+            for my $name ( qw(id name) ) {
+                next NAME unless exists $attr->{$name};
+                $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
+            }
+            $html .= qq{>\n};
+            $html .= $self->esc($rest) . qq{\n};
+            $html .= qq{</textarea>\n};
+            next LINE;
+        }
+
     }
 
     # close the form off
