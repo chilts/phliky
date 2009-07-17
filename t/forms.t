@@ -93,6 +93,9 @@ Firstname:
 -
 Surname:
 ^{name=surname}
+-
+Email:
+^{name=email|class=highlight}
 };
 $html_exp = qq{<form action="action.html">
 Firstname:
@@ -100,6 +103,9 @@ Firstname:
 <br />
 Surname:
 <input type="text" name="surname" />
+<br />
+Email:
+<input type="text" name="email" class="highlight" />
 </form>
 };
 $html_got = $phliky->text2html( $text );

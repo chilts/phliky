@@ -261,7 +261,7 @@ sub form {
 
     # create the start of the form
     my $html = qq{<form action="} . $self->esc($action) . q{"};
-    for my $name ( qw(id name method enctype accept) ) {
+    for my $name ( qw(id name class method enctype accept) ) {
         next unless exists $attr->{$name};
         $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
     }
@@ -286,7 +286,7 @@ sub form {
         if ( $type eq '^' ) {
             $html .= qq{<input type="text"};
           NAME:
-            for my $name ( qw(id name) ) {
+            for my $name ( qw(id name class) ) {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
@@ -298,7 +298,7 @@ sub form {
         if ( $type eq '&' ) {
             $html .= qq{<input type="hidden"};
           NAME:
-            for my $name ( qw(id name) ) {
+            for my $name ( qw(id name class) ) {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
@@ -323,7 +323,7 @@ sub form {
         if ( $type eq '[' ) {
             $html .= qq{<input type="checkbox"};
           NAME:
-            for my $name ( qw(id name) ) {
+            for my $name ( qw(id name class) ) {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
@@ -335,7 +335,7 @@ sub form {
         if ( $type eq '@' ) {
             $html .= qq{<input type="radio"};
           NAME:
-            for my $name ( qw(id name) ) {
+            for my $name ( qw(id name class) ) {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
@@ -347,7 +347,7 @@ sub form {
         if ( $type eq '>' ) {
             $html .= qq{<input type="submit"};
           NAME:
-            for my $name ( qw(id name) ) {
+            for my $name ( qw(id name class) ) {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
@@ -359,7 +359,7 @@ sub form {
         if ( $type eq '!' ) {
             $html .= qq{<input type="button"};
           NAME:
-            for my $name ( qw(id name) ) {
+            for my $name ( qw(id name class) ) {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
@@ -371,7 +371,7 @@ sub form {
         if ( $type eq '=' ) {
             $html .= qq{<textarea};
           NAME:
-            for my $name ( qw(id name) ) {
+            for my $name ( qw(id name class) ) {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
