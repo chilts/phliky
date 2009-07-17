@@ -307,6 +307,19 @@ sub form {
             next LINE;
         }
 
+        if ( $type eq '#' ) {
+            $html .= qq{<label};
+          NAME:
+            for my $name ( qw(for) ) {
+                next NAME unless exists $attr->{$name};
+                $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
+            }
+            $html .= qq{>};
+            $html .= $self->esc($rest);
+            $html .= qq{</label>\n};
+            next LINE;
+        }
+
         if ( $type eq '[' ) {
             $html .= qq{<input type="checkbox"};
           NAME:

@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 14;
+plan tests => 15;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -121,6 +121,21 @@ $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'form with hidden input');
 
 ## ----------------------------------------------------------------------------
+# form with a label
+
+$text = qq{% action.html
+#{for=email} Email
+^{id=email|name=email} me\@example.com
+};
+$html_exp = qq{<form action="action.html">
+<label for="email">Email</label>
+<input type="text" id="email" name="email" value="me\@example.com" />
+</form>
+};
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'form with a submit button');
+
+## ----------------------------------------------------------------------------
 # form with textarea
 
 $text = qq{% action.html
@@ -178,7 +193,7 @@ $html_exp = qq{<form action="action.html">
 </form>
 };
 $html_got = $phliky->text2html( $text );
-is($html_got, $html_exp, 'form with a submit button');
+is($html_got, $html_exp, 'form with a button');
 
 ## ----------------------------------------------------------------------------
 # form with a submit button
