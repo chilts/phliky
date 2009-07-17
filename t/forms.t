@@ -11,7 +11,7 @@ use Text::Phliky;
 
 ## ----------------------------------------------------------------------------
 
-plan tests => 12;
+plan tests => 14;
 
 ## ----------------------------------------------------------------------------
 # create the object and some variables
@@ -104,6 +104,21 @@ Surname:
 };
 $html_got = $phliky->text2html( $text );
 is($html_got, $html_exp, 'form with text input');
+
+## ----------------------------------------------------------------------------
+# form with hidden input
+
+$text = qq{% action.html
+&{name=something}
+&{name=else} hidden
+};
+$html_exp = qq{<form action="action.html">
+<input type="hidden" name="something" />
+<input type="hidden" name="else" value="hidden" />
+</form>
+};
+$html_got = $phliky->text2html( $text );
+is($html_got, $html_exp, 'form with hidden input');
 
 ## ----------------------------------------------------------------------------
 # form with textarea
