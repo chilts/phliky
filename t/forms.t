@@ -145,12 +145,12 @@ is($html_got, $html_exp, 'form with a submit button');
 # form with textarea
 
 $text = qq{% action.html
+={name=empty}
 ={name=feedback} Something here
 };
 $html_exp = qq{<form action="action.html">
-<textarea name="feedback">
-Something here
-</textarea>
+<textarea name="empty"></textarea>
+<textarea name="feedback">Something here</textarea>
 </form>
 };
 $html_got = $phliky->text2html( $text );

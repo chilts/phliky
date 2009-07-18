@@ -375,8 +375,8 @@ sub form {
                 next NAME unless exists $attr->{$name};
                 $html .= qq{ $name="} . $self->esc($attr->{$name}) . q{"};
             }
-            $html .= qq{>\n};
-            $html .= $self->esc($rest) . qq{\n};
+            $html .= qq{>};
+            $html .= $self->esc($rest) if defined $rest;
             $html .= qq{</textarea>\n};
             next LINE;
         }
